@@ -1,0 +1,14 @@
+.[MASTER]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    consider-using-f-string,
+    too-many-locals,
+    no-member,
+    fixme,
+    too-few-public-methods,
+    broad-exception-caught
+
+[DESIGN]
+max-parents=15

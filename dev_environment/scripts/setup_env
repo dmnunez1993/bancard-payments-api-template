@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+mkdir -p $HOME/.virtualenvs/
+
+cd $HOME/.virtualenvs/
+
+# Setup virtualenv
+if [ ! -d "venv" ]; then
+  echo "Setting up virtualenv..."
+  virtualenv --system-site-packages -p python3 venv 
+fi
+
+source /etc/bash_completion
+
+cd /bancard_payments_api
+
+# Set up postgresql
+setup_postgresql
+
+# Set up vscode settings
+setup_vscode_settings
+
+# Start postgresql
+sudo su - postgres -c "/usr/lib/postgresql/14/bin/pg_ctl -D /var/lib/postgresql/14/main -l logfile start"
+
+# Start minio
+sudo -E minio server /minio_data --address :${MINIO_INTERNAL_PORT:-9000} --console-address :${MINIO_CONSOLE_INTERNAL_PORT:-9001} &>/dev/null &
+
+# Start redis
+sudo redis-server &>/dev/null &
+
+if [ -f $HOME/.bashrc ]; then
+  source $HOME/.bashrc
+fi
+
+source $HOME/.virtualenvs/venv/bin/activate
+
+export PATH=/home/diego/.local/bin:$PATH
+
+# Start bash
+stty sane
+bash -l

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+source /etc/bash_completion
+
+source $HOME/.virtualenvs/venv/bin/activate
+
+# Start bash
+bash -l
+stty sane

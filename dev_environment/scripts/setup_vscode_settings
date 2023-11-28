@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+homedir=$( getent passwd "$USER" | cut -d: -f6 )
+
+if [[ ! -f $homedir/vscode_settings_set ]]; then
+    echo "Setting vscode settings..."
+    mkdir -p /bancard_payments_api/.vscode
+    cp /bancard_payments_api/vscode_settings_template.json /bancard_payments_api/.vscode/settings.json
+    touch $homedir/vscode_settings_set
+fi

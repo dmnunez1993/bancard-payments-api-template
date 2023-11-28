@@ -1,0 +1,235 @@
+#!/usr/bin/env python3
+import datetime
+import os
+import subprocess
+import sys
+
+from dotenv import load_dotenv
+
+API_IMAGE_NAME = 'bancard_payments_api_template_api'
+NGINX_IMAGE_NAME = 'bancard_payments_api_template_nginx'
+DEFAULT_COMPOSE_NAME = 'bancard_payments_api_template_prod'
+
+IMAGE_NAMES = [
+    API_IMAGE_NAME,
+    NGINX_IMAGE_NAME,
+]
+
+if os.path.isfile(".env"):
+    print("Loading env file...")
+    load_dotenv(".env")
+
+
+def get_compose_name():
+    compose_name = os.environ.get('COMPOSE_NAME', DEFAULT_COMPOSE_NAME)
+    return compose_name
+
+
+VOLUME_NAMES = [
+    f'{get_compose_name()}_logs',
+]
+
+
+def run_command(command):
+    subprocess.call(command, shell=True)
+
+
+def get_repo_root():
+    return subprocess.check_output(
+        'git rev-parse --show-toplevel'.split(), encoding='utf-8'
+    ).strip()
+
+
+def backup_volume(volume_name, backup_path):
+    command = f'''
+        docker run --rm -v {volume_name}:/data -v f{backup_path}:/backup \
+            busybox tar zcvf /backup/{volume_name}.tar.gz /data
+    '''
+
+    run_command(command)
+    uid = os.getuid()
+    command = f'''
+        docker run --rm -v {backup_path}:/backup busybox chown {uid}:{uid} /backup/{volume_name}.tar.gz
+    '''
+    run_command(command)
+
+
+def backup_data(backup_path):
+    data_path = os.path.join(backup_path, get_compose_name())
+    run_command(f'mkdir -p {data_path}')
+    run_command(f'rm -rf {data_path}/*')
+    for volume_name in VOLUME_NAMES:
+        print(f"Backing up volume {volume_name}...")
+        backup_volume(volume_name, data_path)
+
+    repo_root = get_repo_root()
+    env_file_path = os.path.join(repo_root, 'prod', '.env')
+
+    if os.path.isfile(env_file_path):
+        print("Backing up .env file...")
+        run_command(f'cp {env_file_path} {data_path}')
+    
+    backup_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    backup_name = f'{get_compose_name()}_{backup_time}'
+    command = f'''
+        docker run --rm -v {data_path}:/data -v {backup_path}:/backup \
+            busybox tar zcvf /backup/{backup_name}.tar.gz /data
+    '''
+    print("Compressing files...")
+    run_command(command)
+    uid = os.getuid()
+    command = f'''
+        docker run --rm -v {backup_path}:/backup \
+            busybox chown {uid}:{uid} /backup/{backup_name}.tar.gz
+    '''
+    run_command(command)
+    print("Deleting data files...")
+    run_command(f'rm -rf {data_path}')
+
+
+def restore_volume(volume_name, backup_path):
+    command = f'''
+        docker run --rm -v {volume_name}:/data -v {backup_path}:/backup \
+            busybox tar zxvf /backup/{volume_name}.tar.gz
+    '''
+    run_command(command)
+
+
+def restore_data(backup_file):
+    backup_path = os.path.dirname(backup_file)
+    data_path = os.path.join(backup_path, get_compose_name())
+    file_name = os.path.basename(backup_file)
+    repo_root = get_repo_root()
+    uid = os.getuid()
+
+    print("Restoring data files...")
+    run_command(f'mkdir -p {data_path}')
+    command = f'''
+        docker run --rm -v {data_path}:/data -v {backup_path}:/backup \
+            busybox tar zxvf /backup/{file_name}
+    '''
+    run_command(command)
+    command = f'''docker run --rm -v {backup_path}:/backup busybox chown -R {uid}:{uid} /backup'''
+    run_command(command)
+
+    for volume_name in VOLUME_NAMES:
+        print(f"Restoring volume {volume_name}")
+        restore_volume(volume_name, data_path)
+
+    env_file_source_path = os.path.join(data_path, '.env')
+    env_file_target_path = os.path.join(repo_root, 'prod', '.env')
+    run_command(f'cp {env_file_source_path} {env_file_target_path}')
+    print("Deleting data files...")
+    run_command(f'rm -rf {data_path}')
+
+
+def clear():
+    stop()
+    run_command(f'docker-compose -p {get_compose_name()} rm -f')
+    for image_name in IMAGE_NAMES:
+        run_command(f'docker image rm {image_name}:latest')
+
+    for volume_name in VOLUME_NAMES:
+        run_command(f'docker volume rm {volume_name}')
+
+
+def stop():
+    print("Stopping services...")
+    run_command(
+        f'cd prod/ && docker-compose -p {get_compose_name()} stop'
+    )
+
+
+def main():
+    command = sys.argv[1]
+
+    repo_root = get_repo_root()
+    api_dockerfile_path = os.path.join(
+        repo_root, 'prod', 'api', 'Dockerfile'
+    )
+
+    nginx_dockerfile_path = os.path.join(
+        repo_root, 'prod', 'nginx', 'Dockerfile'
+    )
+
+    compose_name = get_compose_name()
+
+    if command == 'build':
+        print("Building services...")
+        build_args = []
+        build_args = " ".join(build_args)
+
+        run_command(
+            f'''
+                cd {repo_root} && \ 
+                    docker build -f {api_dockerfile_path} -t {API_IMAGE_NAME}:latest .
+            '''
+        )
+        run_command(
+            f'''
+                cd {repo_root} && \
+                    docker build -f {nginx_dockerfile_path} -t {NGINX_IMAGE_NAME}:latest .
+            '''
+        )
+
+    if command == 'push':
+        registry = sys.argv[2]
+
+        for image_name in IMAGE_NAMES:
+            run_command(
+                f'''docker tag {image_name}:latest {registry}/{image_name}'''
+            )
+            run_command(f'docker push {registry}/{image_name}')
+
+    if command == 'pull':
+        registry = sys.argv[2]
+
+        for image_name in IMAGE_NAMES:
+            run_command(f'docker pull {registry}/{image_name}')
+            run_command(
+                f'''docker tag {registry}/{image_name} {image_name}:latest'''
+            )
+
+    if command == 'deploy':
+        print("Deploying services...")
+        run_command(
+            f'cd prod/ && docker-compose -p {compose_name} up -d'
+        )
+
+    if command == 'start':
+        print("Starting services...")
+        run_command(f'cd prod/ && docker-compose -p {compose_name} up')
+
+    if command == 'stop':
+        print("Stopping services...")
+        stop()
+
+    if command == 'shell':
+        print("Starting up shell...")
+        run_command(
+            f'''
+                cd prod/ && \
+                    docker-compose -p {compose_name} run api sh -c "cd /api && sh"
+            '''
+        )
+
+    if command == 'shell_nginx':
+        print("Starting up shell...")
+        run_command(
+            f'cd prod/ && docker-compose -p {compose_name} run nginx sh'
+        )
+
+    if command == 'backup':
+        backup_path = sys.argv[2]
+        backup_data(backup_path)
+
+    if command == 'restore':
+        backup_file = sys.argv[2]
+        restore_data(backup_file)
+
+    if command == 'clear':
+        clear()
+
+
+if __name__ == '__main__':
+    main()

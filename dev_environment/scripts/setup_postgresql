@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+
+
+def set_postgresql_set_up():
+    home = os.getenv("HOME")
+    try:
+        with open(os.path.join(home, '.postgresql_installed'), 'w'):
+            pass
+    except Exception:
+        pass
+
+
+def is_postgresql_setup():
+    home = os.getenv("HOME")
+    return os.path.isfile(os.path.join(home, '.postgresql_installed'))
+
+
+def setup_postgresql_server():
+    command = ('sudo rm -rf /var/lib/postgresql/14')
+    subprocess.call(command, shell=True)
+    command = ('sudo su - postgres -c "mkdir -p /var/lib/postgresql/14"')
+    subprocess.call(command, shell=True)
+    command = ('sudo su - postgres -c "/usr/lib/postgresql/14/bin/pg_ctl -D /var/lib/postgresql/14/main initdb"')
+    subprocess.call(command, shell=True)
+    command = ('sudo su - postgres -c "/usr/lib/postgresql/14/bin/pg_ctl -D /var/lib/postgresql/14/main -l logfile start"')
+    subprocess.call(command, shell=True)
+    command = ('sleep 2')
+    subprocess.call(command, shell=True)
+    command = ('sudo cp /postgresql.conf /var/lib/postgresql/14/main/postgresql.conf')
+    subprocess.call(command, shell=True)
+    command = ('sudo cp /pg_hba.conf /var/lib/postgresql/14/main/pg_hba.conf')
+    subprocess.call(command, shell=True)
+    command = ('sudo chown postgres:postgres /var/lib/postgresql/14/main/postgresql.conf')
+    subprocess.call(command, shell=True)
+    command = ('sudo chown postgres:postgres /var/lib/postgresql/14/main/pg_hba.conf')
+    subprocess.call(command, shell=True)
+    command = ('sudo su - postgres -c "psql -c \\"ALTER USER postgres WITH PASSWORD \'postgres\';\\""')
+    subprocess.call(command, shell=True)
+    command = ('sudo su - postgres -c "psql -c \\"CREATE DATABASE bancard_payments_api WITH OWNER postgres ENCODING = \'UTF-8\' TEMPLATE template0;\\""')
+    subprocess.call(command, shell=True)
+    command = ('sudo su - postgres -c "/usr/lib/postgresql/14/bin/pg_ctl -D /var/lib/postgresql/14/main -l logfile stop"')
+    subprocess.call(command, shell=True)
+    command = ('sleep 2')
+    subprocess.call(command, shell=True)
+
+
+def main():
+    if not is_postgresql_setup():
+        setup_postgresql_server()
+        set_postgresql_set_up()
+
+
+if __name__ == '__main__':
+    main()
