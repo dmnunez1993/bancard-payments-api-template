@@ -1,4 +1,3 @@
-aiobcrypt==3.2.0.post1
 aiofile==3.8.8
 aiohttp==3.8.6
 aiosignal==1.3.1
@@ -9,7 +8,6 @@ astroid==3.0.0
 async-timeout==4.0.3
 asyncpg==0.28.0
 attrs==23.1.0
-bcrypt==3.2.2
 caio==0.9.13
 certifi==2023.7.22
 cffi==1.16.0
@@ -31,7 +29,6 @@ isort==5.12.0
 Mako==1.2.4
 MarkupSafe==2.1.3
 mccabe==0.7.0
-miniopy-async==1.16
 multidict==6.0.4
 packaging==23.2
 platformdirs==3.11.0
@@ -56,7 +53,6 @@ typing_extensions==4.8.0
 urllib3==2.0.7
 uvicorn==0.23.2
 virtualenv==20.24.5
-XlsxWriter==3.1.9
 yapf==0.40.2
 yarl==1.9.2
 zipp==3.17.0

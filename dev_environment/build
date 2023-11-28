@@ -20,12 +20,12 @@ def main():
         command = ("docker build "
                     "--build-arg USER_UID={} "
                     "--build-arg USER_NAME={} "
-                    "-t bancard_connector_dev_env -f Dockerfile.arm64 .")
+                    "-t bancard_payments_api_dev_env -f Dockerfile.arm64 .")
     else:
         command = ("docker build "
                     "--build-arg USER_UID={} "
                     "--build-arg USER_NAME={} "
-                    "-t bancard_connector_dev_env .")
+                    "-t bancard_payments_api_dev_env .")
     
     run_command(command.format(uid, user))
 
