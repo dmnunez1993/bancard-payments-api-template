@@ -3,7 +3,6 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ValidationError
 
-from api.auth.router import router as auth_router
 from api.common.validation import (
     validation_exception_handler, pydantic_exception_handler
 )
@@ -34,4 +33,3 @@ async def shutdown():
 
 app.add_exception_handler(ValidationError, pydantic_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
-
