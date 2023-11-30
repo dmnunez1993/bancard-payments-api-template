@@ -7,6 +7,8 @@ from api.common.validation import (
     validation_exception_handler, pydantic_exception_handler
 )
 
+from api.routers.bancard import router as bancard_router
+
 from config.allowed_origins import ALLOWED_ORIGINS
 from database.connection import db
 
@@ -30,6 +32,8 @@ async def startup():
 async def shutdown():
     await db.disconnect()
 
+
+app.include_router(bancard_router, prefix="/infonet")
 
 app.add_exception_handler(ValidationError, pydantic_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)

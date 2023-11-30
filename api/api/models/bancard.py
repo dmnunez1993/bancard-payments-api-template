@@ -6,6 +6,22 @@ from api.models.base import BaseModel
 
 M = TypeVar("M", bound=BaseModel)
 
+BANCARD_STATUS_ERROR = "error"
+BANCARD_STATUS_SUCCESS = "success"
+BANCARD_LEVEL_ERROR = "error"
+BANCARD_LEVEL_SUCCESS = "success"
+BANCARD_LEVEL_INFO = "info"
+BANCARD_CODE_SUBSCRIBER_NOT_FOUND = "SubscriberNotFound"
+BANCARD_CODE_SUBSCRIBER_WITHOUT_DEBT = "SubscriberWithoutDebt"
+BANCARD_CODE_INVALID_PARAMETERS = "InvalidParameters"
+BANCARD_CODE_MISSING_PARAMETER = "MissingParameter"
+BANCARD_CODE_OVERDUE_INVOICE = "OverdueInvoice"
+BANCARD_CODE_UNKNOWN_ERROR = "UnknownError"
+BANCARD_CODE_HOST_TRANSACTION_ERROR = "HostTransactionError"
+BANCARD_CODE_PAYMENT_NOT_AUTHORIZED = "PaymentNotAuthorized"
+BANCARD_CODE_PAYMENT_PROCESSED = "PaymentProcessed"
+BANCARD_CODE_QUERY_PROCESSED = "QueryProcessed"
+
 
 class Message(BaseModel):
     level: str
