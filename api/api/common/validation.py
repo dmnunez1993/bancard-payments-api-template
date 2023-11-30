@@ -42,16 +42,27 @@ def _get_field_errors(errors):
 
 async def validation_exception_handler(_: Request, exc: RequestValidationError):
     errors = exc.errors()
-    field_errors = {}
+    response_data = {
+        "status":
+            "success",
+        "tid":
+            0,
+        "messages":
+            [
+                {
+                    "level": "info",
+                    "key": "InvalidParameters",
+                    "dsc": ["Consulta inválida"]
+                }
+            ]
+    }
     for error in errors:
         if error['type'] == 'value_error.jsondecode':
             return JSONResponse(
-                content={"error": ERROR},
+                content=response_data,
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
             )
 
-    field_errors = _get_field_errors(errors)
-    response_data = {"status": FIELD_ERRORS, "errors": field_errors}
     return JSONResponse(
         content=response_data, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
     )

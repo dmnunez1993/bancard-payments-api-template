@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Optional, List
+from typing import TypeVar, List
 
 from pydantic import Field
 
