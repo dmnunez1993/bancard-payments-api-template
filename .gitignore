@@ -14,8 +14,9 @@ backend/static/
 *.pid
 *.vscode
 **/test/
-prod/.env
-backend/.env
+
+# Env Files
+.env
 
 # Macos
 .DS_Store

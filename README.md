@@ -20,9 +20,13 @@ To run the dev environment:
     cd dev_environment
     ./run
 
-### Run the App
+### Start developing
 
-To run the API:
-
+In order to start developing, you need to run the following in the root of the repository:
+    
     cd api
+    cp .env.example .env
+
+Then, to run the app:
+    
     python ./api.py
