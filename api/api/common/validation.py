@@ -42,8 +42,9 @@ async def validation_exception_handler(
     tid = int(req.query_params.get("tid", "0"))
     errors = exc.errors()
     for error in errors:
-        if error['type'] == 'value_error.jsondecode':
-            response_data = content = {
+        if error['type'] == 'value_error.jsondecode' or error[
+            "type"] == 'json_invalid':
+            response_data = {
                 "status":
                     BANCARD_STATUS_ERROR,
                 "tid":

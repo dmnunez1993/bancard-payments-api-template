@@ -32,7 +32,7 @@ class Message(BaseModel):
 class CommerceData(BaseModel):
     cmr_id: int
     cmr_bra: int
-    srv_data: List[str]
+    srv_dta: List[str]
     payment_method: str
 
 
@@ -77,13 +77,13 @@ class PaymentRequest(BaseModel):
     cm_curr: str | None = Field(default=None)
     addl: CommerceData
     type: str
-    barcode: str
+    barcode: str | None = Field(default=None)
 
 
 class PaymentSuccessfulResponse(BancardResponse):
-    tkt: int
-    aut_cod: int
-    prnt_msg: List[str]
+    tkt: int | None = Field(default=None)
+    aut_cod: int | None = Field(default=None)
+    prnt_msg: List[str] | None = Field(default=None)
 
 
 class ReversalRequest(BaseModel):

@@ -4,8 +4,8 @@ from sqlalchemy.sql import func
 
 from database.meta import metadata
 
-invoice_requests = sa.Table(
-    "invoice_requests",
+payment_requests = sa.Table(
+    "payment_requests",
     metadata,
     sa.Column(
         "id",
@@ -19,17 +19,62 @@ invoice_requests = sa.Table(
         nullable=True,
     ),
     sa.Column(
-        "addl",
-        sa.String(1023),
-        nullable=True,
-    ),
-    sa.Column(
         "sub_ids",
         ARRAY(sa.String(length=255)),
         nullable=True,
     ),
     sa.Column(
-        "prd_id",
+        "inv_ids",
+        ARRAY(sa.String(length=255)),
+        nullable=True,
+    ),
+    sa.Column(
+        "amt",
+        sa.DECIMAL(20, 2),
+        nullable=True,
+    ),
+    sa.Column(
+        "curr",
+        sa.String(255),
+        nullable=True,
+    ),
+    sa.Column(
+        "trn_dat",
+        sa.String(255),
+        nullable=True,
+    ),
+    sa.Column(
+        "trn_hou",
+        sa.Integer,
+        nullable=True,
+    ),
+    sa.Column(
+        "cm_amt",
+        sa.DECIMAL(20, 2),
+        nullable=True,
+    ),
+    sa.Column(
+        "cm_curr",
+        sa.String(255),
+        nullable=True,
+    ),
+    sa.Column(
+        "addl",
+        sa.String(1023),
+        nullable=True,
+    ),
+    sa.Column(
+        "type",
+        sa.String(255),
+        nullable=True,
+    ),
+    sa.Column(
+        "tkt",
+        sa.Integer,
+        nullable=True,
+    ),
+    sa.Column(
+        "aut_cod",
         sa.Integer,
         nullable=True,
     ),
