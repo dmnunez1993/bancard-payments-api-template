@@ -1,8 +1,8 @@
 """Add invoice and payment requests table
 
-Revision ID: 37ed7236e23e
+Revision ID: 74d136a07146
 Revises: 
-Create Date: 2023-12-01 20:49:27.344131
+Create Date: 2023-12-01 21:14:33.747425
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '37ed7236e23e'
+revision: str = '74d136a07146'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -45,9 +45,11 @@ def upgrade() -> None:
     sa.Column('trn_dat', sa.String(length=255), nullable=True),
     sa.Column('trn_hou', sa.Integer(), nullable=True),
     sa.Column('cm_amt', sa.DECIMAL(precision=20, scale=2), nullable=True),
-    sa.Column('cm_curr', sa.DECIMAL(precision=20, scale=2), nullable=True),
+    sa.Column('cm_curr', sa.String(length=255), nullable=True),
     sa.Column('addl', sa.String(length=1023), nullable=True),
     sa.Column('type', sa.String(length=255), nullable=True),
+    sa.Column('tkt', sa.Integer(), nullable=True),
+    sa.Column('aut_cod', sa.Integer(), nullable=True),
     sa.Column('response_code', sa.Integer(), nullable=False),
     sa.Column('status', sa.String(length=255), nullable=False),
     sa.Column('level', sa.String(length=255), nullable=False),

@@ -55,7 +55,7 @@ payment_requests = sa.Table(
     ),
     sa.Column(
         "cm_curr",
-        sa.DECIMAL(20, 2),
+        sa.String(255),
         nullable=True,
     ),
     sa.Column(
@@ -66,6 +66,16 @@ payment_requests = sa.Table(
     sa.Column(
         "type",
         sa.String(255),
+        nullable=True,
+    ),
+    sa.Column(
+        "tkt",
+        sa.Integer,
+        nullable=True,
+    ),
+    sa.Column(
+        "aut_cod",
+        sa.Integer,
         nullable=True,
     ),
     sa.Column(

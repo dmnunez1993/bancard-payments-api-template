@@ -42,7 +42,7 @@ def get_subscriber_invoices(
 
     for invoice in sub_invoices:
         if inv_ids is None or (
-            len(invoice["inv_id"]) > 0 and invoice["inv_id"] in inv_ids
+            len(invoice["inv_id"]) > 0 and invoice["inv_id"][0] in inv_ids
         ):
             invoices.append(invoice)
 

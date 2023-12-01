@@ -133,10 +133,10 @@ async def payment(payment_request: PaymentRequest, response: Response):
         "amt": payment_request.amt,
         "curr": payment_request.curr,
         "trn_dat": payment_request.trn_dat,
-        "trn_houd": payment_request.trn_hou,
+        "trn_hou": payment_request.trn_hou,
         "cm_amt": payment_request.cm_amt,
         "cm_curr": payment_request.cm_curr,
-        "addl": json.dumps(payment_request.addl),
+        "addl": json.dumps(payment_request.addl.model_dump()),
         "type": payment_request.type
     }
 
@@ -263,12 +263,14 @@ async def payment(payment_request: PaymentRequest, response: Response):
                 ]
         }
 
+    request_data["tkt"] = 0
+    request_data["aut_cod"] = 0
     request_data["response_code"] = status.HTTP_200_OK
     request_data["status"] = BANCARD_STATUS_SUCCESS
     request_data["level"] = BANCARD_LEVEL_SUCCESS
     request_data["key"] = BANCARD_CODE_PAYMENT_PROCESSED
-    request_data["dsc"] = ["Consulta procesada con éxito"]
-    query = invoice_requests.insert().values(request_data)
+    request_data["dsc"] = ["El pago fue autorizado"]
+    query = payment_requests.insert().values(request_data)
     await db.execute(query)
 
     response.status_code = request_data["response_code"]
@@ -276,6 +278,8 @@ async def payment(payment_request: PaymentRequest, response: Response):
     return {
         "status": request_data["status"],
         "tid": request_data["tid"],
+        "tkt": request_data["tkt"],
+        "aut_cod": request_data["aut_cod"],
         "messages":
             [
                 {
