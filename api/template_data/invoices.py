@@ -29,10 +29,21 @@ INVOICES = [
 ]
 
 
-def get_subscriber_invoices(sub_ids: List[str]) -> List[Dict[Any, Any]]:
-    invoices = []
+def get_subscriber_invoices(
+    sub_ids: List[str],
+    inv_ids: List[str] | None = None
+) -> List[Dict[Any, Any]]:
+    sub_invoices = []
     for invoice in INVOICES:
         if invoice["sub_id"] in sub_ids:
+            sub_invoices.append(invoice)
+
+    invoices = []
+
+    for invoice in sub_invoices:
+        if inv_ids is None or (
+            len(invoice["inv_id"]) > 0 and invoice["inv_id"] in inv_ids
+        ):
             invoices.append(invoice)
 
     return invoices
