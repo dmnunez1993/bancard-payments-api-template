@@ -26,6 +26,7 @@ In order to start developing, you need to run the following in the root of the r
     
     cd api
     cp .env.example .env
+    pip install -r requirements.txt
 
 Then, to run the app:
     
