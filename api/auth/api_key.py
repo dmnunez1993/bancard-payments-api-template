@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict, Any, Tuple
 
 from asyncio import get_running_loop
 
@@ -53,7 +53,9 @@ class KeyGenerator(object):
         return sha256_crypt.verify(key, hashed_key)
 
 
-async def generate_api_key(name: str, permissions: List[str]):
+async def generate_api_key(
+    name: str, permissions: List[str]
+) -> Tuple[Dict[str, Any], str]:
     loop = get_running_loop()
     key_generator = KeyGenerator()
 
@@ -75,7 +77,7 @@ async def generate_api_key(name: str, permissions: List[str]):
     return api_key_data, key
 
 
-async def has_permission(key: str, permission: str):
+async def validate_key(key: str) -> Dict[str, Any] | None:
     loop = get_running_loop()
     key_generator = KeyGenerator()
 
@@ -86,13 +88,22 @@ async def has_permission(key: str, permission: str):
     api_key = await db.fetch_one(query)
 
     if api_key is None:
-        return False
+        return None
 
-    is_valid = await loop.run_in_executor(
+    key_valid = await loop.run_in_executor(
         None, key_generator.verify, key, api_key["hashed_key"]
     )
 
-    if not is_valid:
+    if not key_valid:
+        return None
+
+    return api_key
+
+
+async def has_permission(key: str, permission: str):
+    api_key = await validate_key(key)
+
+    if api_key is None:
         return False
 
     return permission in api_key["permissions"]

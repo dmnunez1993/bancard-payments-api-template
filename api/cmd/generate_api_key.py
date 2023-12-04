@@ -10,7 +10,10 @@ from database.connection import db
 
 async def _connect_and_create_api_key(name: str, permissions: List[str]):
     await db.connect()
-    await generate_api_key(name, permissions)
+    _, key = await generate_api_key(name, permissions)
+
+    print(f"Api-Key: {key}")
+
     await db.disconnect()
 
 
