@@ -37,7 +37,7 @@ To access the API endpoints, it is first required to create an API Key, assignin
 
     python ./cmd/generate_api_key.py -n "My Api Key" -p "get_invoices" -p "add_payments" -p "reverse_payments"
 
-Permissions for each enpoint are as follows:
+Permissions for each endpoint are as follows:
 
 * get_invoices: Allows to list the invoices available
 * add_payments: Allows to add a payment
