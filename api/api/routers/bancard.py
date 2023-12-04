@@ -1,8 +1,9 @@
 import json
 from typing import Annotated
 
-from fastapi import Response, status, Query
+from fastapi import Response, status, Query, Depends
 
+from api.auth.permissions import PermissionRequired
 from api.common.router import create_api_router
 from api.models.bancard import (
     BancardResponse,
@@ -23,7 +24,7 @@ from api.models.bancard import (
     BANCARD_CODE_TRANSACTION_NOT_REVERSED,
     BANCARD_CODE_TRANSACTION_REVERSED,
 )
-
+from auth.perrmissions import (GET_INVOICES, ADD_PAYMENTS, REVERSE_PAYMENTS)
 from database.connection import db
 from database.models.invoice_request import invoice_requests
 from database.models.payment_request import payment_requests
@@ -34,7 +35,11 @@ from template_data.invoices import (subscriber_exists, get_subscriber_invoices)
 router = create_api_router()
 
 
-@router.get("/invoices", response_model=InvoicesResponse)
+@router.get(
+    "/invoices",
+    response_model=InvoicesResponse,
+    dependencies=[Depends(PermissionRequired(GET_INVOICES))]
+)
 async def get_invoices(
     tid: int,
     prd_id: int,
@@ -131,7 +136,11 @@ async def get_invoices(
     }
 
 
-@router.post("/payment", response_model=PaymentSuccessfulResponse)
+@router.post(
+    "/payment",
+    response_model=PaymentSuccessfulResponse,
+    dependencies=[Depends(PermissionRequired(ADD_PAYMENTS))]
+)
 async def payment(payment_request: PaymentRequest, response: Response):
     request_data = {
         "tid": payment_request.tid,
@@ -299,7 +308,11 @@ async def payment(payment_request: PaymentRequest, response: Response):
     }
 
 
-@router.post("/reverse", response_model=BancardResponse)
+@router.post(
+    "/reverse",
+    response_model=BancardResponse,
+    dependencies=[Depends(PermissionRequired(REVERSE_PAYMENTS))]
+)
 async def reverse(reversal_request: ReversalRequest, response: Response):
     request_data = {
         "tid": reversal_request.tid,

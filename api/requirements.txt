@@ -31,6 +31,7 @@ MarkupSafe==2.1.3
 mccabe==0.7.0
 multidict==6.0.4
 packaging==23.2
+passlib==1.7.4
 platformdirs==3.11.0
 pluggy==1.3.0
 psycopg2==2.9.9
@@ -44,6 +45,7 @@ PyJWT==2.8.0
 pylint==3.0.1
 pytest==7.4.2
 python-dotenv==1.0.0
+PyYAML==5.4.1
 sniffio==1.3.0
 SQLAlchemy==1.4.49
 starlette==0.27.0

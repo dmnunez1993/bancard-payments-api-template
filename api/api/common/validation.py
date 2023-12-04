@@ -8,14 +8,12 @@ from api.models.bancard import (
     BANCARD_LEVEL_ERROR,
     BANCARD_CODE_INVALID_PARAMETERS,
     BANCARD_CODE_MISSING_PARAMETER,
-    BANCARD_CODE_UNKNOWN_ERROR,
 )
 
 
 def _get_field_messages(errors):
     messages = []
     for error in errors:
-        print(error)
         if error['type'] != "missing" and error['type'] != "value_error":
             continue
 
@@ -80,27 +78,4 @@ async def validation_exception_handler(
 async def pydantic_exception_handler(req: Request, exc: ValidationError):
     return await validation_exception_handler(
         req, RequestValidationError(errors=exc.errors())
-    )
-
-
-async def global_exception_handler(req: Request, _: Exception):
-    tid = int(req.query_params.get("tid", "0"))
-    response_data = {
-        "status":
-            BANCARD_STATUS_ERROR,
-        "tid":
-            tid,
-        "messages":
-            [
-                {
-                    "level": BANCARD_LEVEL_ERROR,
-                    "key": BANCARD_CODE_UNKNOWN_ERROR,
-                    "dsc": ["Error desconocido"]
-                }
-            ]
-    }
-
-    return JSONResponse(
-        content=response_data,
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
     )
