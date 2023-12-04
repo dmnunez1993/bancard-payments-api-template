@@ -1,17 +1,8 @@
 from typing import Annotated, Dict, Any
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import HTTPException, status, Depends
 
-from auth.api_key import validate_key
-
-
-async def verify_api_key(x_api_key: Annotated[str, Header()]) -> Dict[str, Any]:
-    api_key_data = await validate_key(x_api_key)
-
-    if api_key_data is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    return api_key_data
+from .api_key import verify_api_key
 
 
 class PermissionRequired(object):
@@ -26,4 +17,4 @@ class PermissionRequired(object):
         ],
     ):
         if self._permission not in api_key["permissions"]:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
