@@ -15,7 +15,6 @@ from api.models.bancard import (
 def _get_field_messages(errors):
     messages = []
     for error in errors:
-        print(error)
         if error['type'] != "missing" and error['type'] != "value_error":
             continue
 
