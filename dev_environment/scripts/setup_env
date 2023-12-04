@@ -40,3 +40,4 @@ export PATH=/home/diego/.local/bin:$PATH
 # Start bash
 stty sane
 bash -l
+stty sane
