@@ -4,7 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ValidationError
 
 from api.common.validation import (
-    validation_exception_handler, pydantic_exception_handler
+    validation_exception_handler,
+    pydantic_exception_handler,
+    global_exception_handler,
 )
 
 from api.routers.bancard import router as bancard_router
@@ -37,3 +39,4 @@ app.include_router(bancard_router, prefix="/infonet")
 
 app.add_exception_handler(ValidationError, pydantic_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, global_exception_handler)
