@@ -299,13 +299,13 @@ async def payment(payment_request: PaymentRequest, response: Response):
     }
 
 
-@router.post("/payment", response_model=BancardResponse)
+@router.post("/reverse", response_model=BancardResponse)
 async def reverse(reversal_request: ReversalRequest, response: Response):
     request_data = {
         "tid": reversal_request.tid,
     }
 
-    reversal_query = reverse_payment_requests.select(
+    reversal_query = reverse_payment_requests.select().where(
         reverse_payment_requests.c.tid == request_data["tid"]
     )
 
@@ -338,9 +338,9 @@ async def reverse(reversal_request: ReversalRequest, response: Response):
                 ]
         }
 
-    payments_query = payment_requests.select(
+    payments_query = payment_requests.select().where(
         payment_requests.c.tid == request_data["tid"],
-        payment_requests.c.code == BANCARD_CODE_PAYMENT_PROCESSED
+        payment_requests.c.key == BANCARD_CODE_PAYMENT_PROCESSED
     )
 
     payments_res = await db.fetch_one(payments_query)
@@ -377,7 +377,7 @@ async def reverse(reversal_request: ReversalRequest, response: Response):
     request_data["level"] = BANCARD_LEVEL_SUCCESS
     request_data["key"] = BANCARD_CODE_TRANSACTION_REVERSED
     request_data["dsc"] = ["Transacción reversada satisfactoriamente"]
-    query = payment_requests.insert().values(request_data)
+    query = reverse_payment_requests.insert().values(request_data)
     await db.execute(query)
 
     response.status_code = request_data["response_code"]
