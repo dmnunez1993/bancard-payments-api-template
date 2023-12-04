@@ -59,6 +59,8 @@ async def generate_api_key(
     loop = get_running_loop()
     key_generator = KeyGenerator()
 
+    # Since the sha256 algorithms are CPU bound, it is
+    # necessary to run the generation in a separate thread
     key, prefix, hashed_key = await loop.run_in_executor(
         None,
         key_generator.generate,
@@ -90,6 +92,8 @@ async def validate_key(key: str) -> Dict[str, Any] | None:
     if api_key is None:
         return None
 
+    # Since the sha256 algorithms are CPU bound, it is
+    # necessary to run the validation in a separate thread
     key_valid = await loop.run_in_executor(
         None, key_generator.verify, key, api_key["hashed_key"]
     )
