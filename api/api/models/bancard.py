@@ -1,10 +1,8 @@
-from typing import TypeVar, List
+from typing import List
 
 from pydantic import Field
 
 from api.models.base import BaseModel
-
-M = TypeVar("M", bound=BaseModel)
 
 BANCARD_STATUS_ERROR = "error"
 BANCARD_STATUS_SUCCESS = "success"
@@ -21,6 +19,8 @@ BANCARD_CODE_HOST_TRANSACTION_ERROR = "HostTransactionError"
 BANCARD_CODE_PAYMENT_NOT_AUTHORIZED = "PaymentNotAuthorized"
 BANCARD_CODE_PAYMENT_PROCESSED = "PaymentProcessed"
 BANCARD_CODE_QUERY_PROCESSED = "QueryProcessed"
+BANCARD_CODE_TRANSACTION_NOT_REVERSED = "TransactionNotReversed"
+BANCARD_CODE_TRANSACTION_REVERSED = "TransactionReversed"
 
 
 class Message(BaseModel):
