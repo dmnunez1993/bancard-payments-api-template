@@ -41,4 +41,4 @@ Permissions for each endpoint are as follows:
 
 * get_invoices: Allows to list the invoices available
 * add_payments: Allows to add a payment
-* reverse_payment: Allows to reverse a payment 
+* reverse_payments: Allows to reverse a payment 
